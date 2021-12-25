@@ -1,38 +1,101 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"net"
 	"net/http"
 	"os"
-
-	"github.com/gorilla/mux"
+	"time"
 )
 
 type User struct {
-	Name     string
-	Email    string
-	Password string
+	Id        string
+	Name      string
+	Email     string
+	Password  string
+	CreatedAt time.Time
 }
 
-type Response struct {
-	Status int
-	Data   []User
+func getUsers(db *sql.DB) http.HandlerFunc {
+
+	type Response struct {
+		Status int
+		Users  []User
+	}
+
+	fn := func(w http.ResponseWriter, r *http.Request) {
+
+		var users []User
+
+		rows, err := db.Query(`SELECT * FROM users ORDER BY created_at DESC`)
+		if err != nil {
+			panic(err)
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var u User
+			err := rows.Scan(&u.Id, &u.Name, &u.Email, &u.Password, &u.CreatedAt)
+			if err != nil {
+				panic(err)
+			}
+			users = append(users, u)
+		}
+		err = rows.Err()
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(Response{
+			Status: 200,
+			Users:  users,
+		})
+	}
+
+	return fn
+
 }
 
-var users []User
-var user User
+func getUser(db *sql.DB) http.HandlerFunc {
 
-func getUsers(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
-}
+	type Response struct {
+		Status int
+		User   User
+	}
 
-func getUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	users = append(users, User{Name: "Onur Kaçmaz", Email: "kacmaz.onur@hotmail.com", Password: "1234"})
-	json.NewEncoder(w).Encode(Response{Status: 200, Data: users})
+	fn := func(w http.ResponseWriter, r *http.Request) {
+
+		params := mux.Vars(r)
+		requestedId := params["id"]
+
+		var (
+			id        int
+			name      string
+			email     string
+			password  string
+			createdAt time.Time
+		)
+
+		err := db.QueryRow(`SELECT * FROM users WHERE id = ?`, requestedId).Scan(&id, &name, &email, &password, &createdAt)
+		if err != nil {
+			panic(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(Response{
+			Status: 200,
+			User: User{
+				Id:        requestedId,
+				Name:      name,
+				Email:     email,
+				Password:  password,
+				CreatedAt: createdAt,
+			},
+		})
+	}
+	return fn
 }
 
 func main() {
@@ -41,12 +104,17 @@ func main() {
 	port := os.Getenv("PORT")
 	address := net.JoinHostPort(host, port)
 
+	db, err := sql.Open("mysql", "root:@(127.0.0.1:3306)/go_rest?parseTime=true")
+	if err != nil {
+		panic(err)
+	}
+
 	router := mux.NewRouter()
 	usersRouter := router.PathPrefix("/api/v1").Subrouter()
-	usersRouter.HandleFunc("/users", getUsers).Methods("GET")
-	usersRouter.HandleFunc("/users/{id}", getUser).Methods("GET")
+	usersRouter.HandleFunc("/users", getUsers(db)).Methods("GET")
+	usersRouter.HandleFunc("/users/{id}", getUser(db)).Methods("GET")
 
-	fmt.Printf("server is running at %v", address)
+	fmt.Printf("server is running at %v \n", address)
 	http.ListenAndServe(address, router)
 
 }
