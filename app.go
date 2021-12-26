@@ -6,6 +6,8 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -37,7 +39,7 @@ func getUsers(db *sql.DB) http.HandlerFunc {
 		defer func(rows *sql.Rows) {
 			err := rows.Close()
 			if err != nil {
-				
+				panic(err)
 			}
 		}(rows)
 
@@ -167,11 +169,25 @@ func createUser(db *sql.DB) http.HandlerFunc {
 
 func main() {
 
+	fmt.Printf("Database name: %s\n", os.Getenv(""))
+
+	err := godotenv.Load("local.env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	host := os.Getenv("ADDRESS")
 	port := os.Getenv("PORT")
 	address := net.JoinHostPort(host, port)
 
-	db, err := sql.Open("mysql", "root:@(127.0.0.1:3306)/go_rest?parseTime=true")
+	dbName := os.Getenv("DB_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUrl := net.JoinHostPort(dbHost, dbPort)
+
+	db, err := sql.Open("mysql", dbUser+":"+dbPassword+"@("+dbUrl+")/"+dbName+"?parseTime=true")
 	if err != nil {
 		panic(err)
 	}
