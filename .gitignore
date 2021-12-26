@@ -17,4 +17,5 @@
 =======
 .idea
 .env
+*.sum
 >>>>>>> 49253ec (add gitignore file)
