@@ -168,10 +168,8 @@ func createUser(db *sql.DB) http.HandlerFunc {
 }
 
 func main() {
-
-	fmt.Printf("Database name: %s\n", os.Getenv(""))
-
-	err := godotenv.Load("local.env")
+	
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
