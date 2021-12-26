@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type User struct {
@@ -19,6 +20,11 @@ type User struct {
 	Email     string
 	Password  string
 	CreatedAt string
+}
+
+type Response struct {
+	Status int
+	User   User
 }
 
 func getUsers(db *sql.DB) http.HandlerFunc {
@@ -68,12 +74,6 @@ func getUsers(db *sql.DB) http.HandlerFunc {
 }
 
 func showUser(db *sql.DB) http.HandlerFunc {
-
-	type Response struct {
-		Status int
-		User   User
-	}
-
 	fn := func(w http.ResponseWriter, r *http.Request) {
 
 		params := mux.Vars(r)
@@ -128,12 +128,6 @@ func deleteUser(db *sql.DB) http.HandlerFunc {
 }
 
 func createUser(db *sql.DB) http.HandlerFunc {
-
-	type Response struct {
-		Status int
-		User   User
-	}
-
 	fn := func(w http.ResponseWriter, r *http.Request) {
 
 		decoder := json.NewDecoder(r.Body)
@@ -167,8 +161,47 @@ func createUser(db *sql.DB) http.HandlerFunc {
 	return fn
 }
 
+func updateUser(db *sql.DB) http.HandlerFunc {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Content-Type", "application/json")
+
+		params := mux.Vars(r)
+		decoder := json.NewDecoder(r.Body)
+		var data User
+		err := decoder.Decode(&data)
+		if err != nil {
+			panic(err)
+
+		}
+		id, err := strconv.Atoi(params["id"])
+		if err != nil {
+			panic(err)
+		}
+		data.Id = id
+		result, err := db.Exec(`UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?`, data.Name, data.Email, data.Password, data.Id)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = result.LastInsertId()
+		if err != nil {
+			panic(err)
+		}
+
+		err = json.NewEncoder(w).Encode(Response{
+			Status: 200,
+			User:   data,
+		})
+		if err != nil {
+			return
+		}
+	}
+	return fn
+}
+
 func main() {
-	
+
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file")
@@ -196,6 +229,7 @@ func main() {
 	usersRouter.HandleFunc("/users/{id}", showUser(db)).Methods("GET")
 	usersRouter.HandleFunc("/users/{id}", deleteUser(db)).Methods("DELETE")
 	usersRouter.HandleFunc("/users", createUser(db)).Methods("POST")
+	usersRouter.HandleFunc("/users/{id}", updateUser(db)).Methods("PUT")
 
 	fmt.Printf("server is running at %v \n", address)
 	err = http.ListenAndServe(address, router)
