@@ -18,5 +18,11 @@ func ConfigureRoutes() *mux.Router {
 	usersRouter.HandleFunc("/users/{id}", controllers.ShowUser).Methods("GET")
 	usersRouter.HandleFunc("/users/{id}", controllers.DeleteUser).Methods("DELETE")
 	usersRouter.HandleFunc("/users/{id}", controllers.UpdateUser).Methods("PUT")
+
+	usersRouter.HandleFunc("/tasks", controllers.CreateTask).Methods("POST")
+	usersRouter.HandleFunc("/tasks", controllers.GetTasks).Methods("GET")
+	usersRouter.HandleFunc("/tasks/{id}", controllers.ShowTask).Methods("GET")
+	usersRouter.HandleFunc("/tasks/{id}", controllers.DeleteTask).Methods("DELETE")
+	usersRouter.HandleFunc("/tasks/{id}", controllers.UpdateTask).Methods("PUT")
 	return router
 }
