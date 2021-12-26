@@ -16,4 +16,5 @@
 # vendor/
 =======
 .idea
+.env
 >>>>>>> 49253ec (add gitignore file)
