@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"net"
 	"net/http"
 	"os"
 	"rest-api/config"
 	"rest-api/route"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
