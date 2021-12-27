@@ -143,6 +143,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	decoder := json.NewDecoder(r.Body)
+
 	var data User
 	err := decoder.Decode(&data)
 	if err != nil {

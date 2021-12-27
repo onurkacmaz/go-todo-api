@@ -16,7 +16,7 @@ import (
 
 var (
 	_, b, _, _ = runtime.Caller(0)
-	basepath   = filepath.Dir(b)
+	basePath   = filepath.Dir(b)
 )
 
 func Instance() *sql.DB {
@@ -39,7 +39,7 @@ func Instance() *sql.DB {
 }
 
 func GetFiles() []fs.FileInfo {
-	files, err := ioutil.ReadDir(basepath + "/migrations/")
+	files, err := ioutil.ReadDir(basePath + "/migrations/")
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +48,7 @@ func GetFiles() []fs.FileInfo {
 
 func Migrate() {
 	for _, file := range GetFiles() {
-		byte, err := ioutil.ReadFile(filepath.Join(basepath+"/migrations/", file.Name()))
+		byte, err := ioutil.ReadFile(filepath.Join(basePath+"/migrations/", file.Name()))
 		if err != nil {
 			panic(err)
 		}
@@ -57,5 +57,4 @@ func Migrate() {
 			Instance().Exec(query)
 		}(query)
 	}
-
 }
