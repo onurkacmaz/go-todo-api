@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 func LoadLocalEnv() {
@@ -10,5 +11,4 @@ func LoadLocalEnv() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-	return
 }

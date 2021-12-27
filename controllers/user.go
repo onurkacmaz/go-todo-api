@@ -3,10 +3,11 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"net/http"
 	"rest-api/database"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type User struct {
@@ -52,7 +53,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 		users = append(users, u)
 	}
-	err = rows.Err()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(Response{

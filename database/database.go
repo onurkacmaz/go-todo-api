@@ -2,9 +2,19 @@ package database
 
 import (
 	"database/sql"
+	"io/fs"
+	"io/ioutil"
 	"net"
 	"os"
+	"path/filepath"
 	"rest-api/config"
+	"runtime"
+	"strings"
+)
+
+var (
+	_, b, _, _ = runtime.Caller(0)
+	basepath   = filepath.Dir(b)
 )
 
 func Instance() *sql.DB {
@@ -24,4 +34,30 @@ func Instance() *sql.DB {
 	}
 	return db
 
+}
+
+func GetFiles() []fs.FileInfo {
+	files, err := ioutil.ReadDir(basepath + "/migrations/")
+	if err != nil {
+		panic(err)
+	}
+	return files
+}
+
+func Migrate() {
+	for _, file := range GetFiles() {
+		byte, err := ioutil.ReadFile(filepath.Join(basepath+"/migrations/", file.Name()))
+		if err != nil {
+			panic(err)
+		}
+		query := strings.Replace(string(byte), "{{DB_NAME}}", os.Getenv("DB_NAME"), -1)
+		defer func(query string) {
+			Instance().Exec(query)
+		}(query)
+	}
+
+}
+
+func main() {
+	Migrate()
 }
