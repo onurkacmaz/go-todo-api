@@ -25,7 +25,7 @@ type Response struct {
 
 var db = database.Instance()
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(w http.ResponseWriter, _ *http.Request) {
 
 	type Response struct {
 		Status int
@@ -55,11 +55,14 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Response{
+	err = json.NewEncoder(w).Encode(Response{
 		Status: 200,
 		Users:  users,
 	})
-
+	if err != nil {
+		panic(err)
+	}
+	return
 }
 
 func ShowUser(w http.ResponseWriter, r *http.Request) {
