@@ -10,6 +10,8 @@ import (
 	"rest-api/config"
 	"runtime"
 	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -56,8 +58,4 @@ func Migrate() {
 		}(query)
 	}
 
-}
-
-func main() {
-	Migrate()
 }

@@ -6,14 +6,15 @@ import (
 	"net/http"
 	"os"
 	"rest-api/config"
+	"rest-api/database"
 	"rest-api/route"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
 
 	config.LoadLocalEnv()
+
+	database.Migrate()
 
 	address := net.JoinHostPort(os.Getenv("ADDRESS"), os.Getenv("PORT"))
 	fmt.Printf("Server is running at %v \n", address)
