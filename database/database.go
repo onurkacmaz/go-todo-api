@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 	"io/fs"
 	"io/ioutil"
 	"net"
@@ -9,9 +10,6 @@ import (
 	"path/filepath"
 	"rest-api/config"
 	"runtime"
-	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -48,13 +46,14 @@ func GetFiles() []fs.FileInfo {
 
 func Migrate() {
 	for _, file := range GetFiles() {
-		byte, err := ioutil.ReadFile(filepath.Join(basePath+"/migrations/", file.Name()))
+		q, err := ioutil.ReadFile(filepath.Join(basePath+"/migrations/", file.Name()))
 		if err != nil {
 			panic(err)
 		}
-		query := strings.Replace(string(byte), "{{DB_NAME}}", os.Getenv("DB_NAME"), -1)
-		defer func(query string) {
-			Instance().Exec(query)
-		}(query)
+
+		_, err = Instance().Exec(string(q))
+		if err != nil {
+			panic(err)
+		}
 	}
 }
