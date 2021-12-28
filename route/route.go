@@ -14,8 +14,8 @@ func route() *mux.Router {
 
 func RegisterRoutes() *mux.Router {
 
-	router.Use(middleware.ContentType, middleware.Accept)
-	
+	router.Use(middleware.ContentType, middleware.Accept, middleware.BasicAuth)
+
 	usersRouter := router.PathPrefix("/api/v1").Subrouter()
 	usersRouter.HandleFunc("/users", controller.CreateUser).Methods("POST")
 	usersRouter.HandleFunc("/users", controller.GetUsers).Methods("GET")
