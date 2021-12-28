@@ -11,7 +11,7 @@ func route() *mux.Router {
 	return mux.NewRouter()
 }
 
-func ConfigureRoutes() *mux.Router {
+func RegisterRoutes() *mux.Router {
 	usersRouter := router.PathPrefix("/api/v1").Subrouter()
 	usersRouter.HandleFunc("/users", controllers.CreateUser).Methods("POST")
 	usersRouter.HandleFunc("/users", controllers.GetUsers).Methods("GET")

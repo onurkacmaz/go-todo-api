@@ -18,7 +18,7 @@ func main() {
 
 	address := net.JoinHostPort(os.Getenv("ADDRESS"), os.Getenv("PORT"))
 	fmt.Printf("Server is running at %v \n", address)
-	err := http.ListenAndServe(address, route.ConfigureRoutes())
+	err := http.ListenAndServe(address, route.RegisterRoutes())
 	if err != nil {
 		return
 	}
