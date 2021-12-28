@@ -19,10 +19,11 @@ func RegisterRoutes() *mux.Router {
 	usersRouter.HandleFunc("/users/{id}", controller.DeleteUser).Methods("DELETE")
 	usersRouter.HandleFunc("/users/{id}", controller.UpdateUser).Methods("PUT")
 
-	usersRouter.HandleFunc("/tasks", controller.CreateTask).Methods("POST")
-	usersRouter.HandleFunc("/tasks", controller.GetTasks).Methods("GET")
-	usersRouter.HandleFunc("/tasks/{id}", controller.ShowTask).Methods("GET")
-	usersRouter.HandleFunc("/tasks/{id}", controller.DeleteTask).Methods("DELETE")
-	usersRouter.HandleFunc("/tasks/{id}", controller.UpdateTask).Methods("PUT")
+	tasksRouter := router.PathPrefix("/api/v1").Subrouter()
+	tasksRouter.HandleFunc("/tasks", controller.CreateTask).Methods("POST")
+	tasksRouter.HandleFunc("/tasks", controller.GetTasks).Methods("GET")
+	tasksRouter.HandleFunc("/tasks/{id}", controller.ShowTask).Methods("GET")
+	tasksRouter.HandleFunc("/tasks/{id}", controller.DeleteTask).Methods("DELETE")
+	tasksRouter.HandleFunc("/tasks/{id}", controller.UpdateTask).Methods("PUT")
 	return router
 }
