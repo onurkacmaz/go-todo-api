@@ -51,9 +51,11 @@ func Migrate() {
 			panic(err)
 		}
 
-		_, err = Instance().Exec(string(q))
-		if err != nil {
-			panic(err)
-		}
+		defer func(q string) {
+			_, err = Instance().Exec(string(q))
+			if err != nil {
+				panic(err)
+			}
+		}(string(q))
 	}
 }
