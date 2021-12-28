@@ -186,3 +186,15 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func GetUserByCredentials(email string, password string) bool {
+	rows, err := db.Query(`SELECT * FROM users WHERE email = ? AND password = ?`, email, password)
+	if err != nil {
+		panic(err)
+	}
+	count := 0
+	for rows.Next() {
+		count++
+	}
+	return !(count <= 0)
+}
