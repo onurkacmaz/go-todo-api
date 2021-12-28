@@ -66,36 +66,46 @@ func GetUsers(w http.ResponseWriter, _ *http.Request) {
 }
 
 func ShowUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	params := mux.Vars(r)
-	requestedId := params["id"]
 
-	var (
-		id        int
-		name      string
-		email     string
-		password  string
-		createdAt string
-	)
-
-	err := db.QueryRow(`SELECT * FROM users WHERE id = ?`, requestedId).Scan(&id, &name, &email, &password, &createdAt)
+	rows, err := db.Query(`SELECT * FROM users WHERE id = ?`, params["id"])
 	if err != nil {
 		panic(err)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(Response{
-		Status: 200,
-		User: User{
-			Id:        id,
-			Name:      name,
-			Email:     email,
-			Password:  password,
-			CreatedAt: createdAt,
-		},
-	})
-	if err != nil {
+	count := 0
+	var user User
+	for rows.Next() {
+		err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.CreatedAt)
+		if err != nil {
+			panic(err)
+		}
+		count++
+	}
+	if count <= 0 {
+		err = json.NewEncoder(w).Encode(struct {
+			Status int
+			User   []string
+		}{
+			Status: 200,
+		})
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
+	err = json.NewEncoder(w).Encode(struct {
+		Status int
+		User   User
+	}{
+		Status: 200,
+		User:   user,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
