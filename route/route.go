@@ -3,6 +3,7 @@ package route
 import (
 	"github.com/gorilla/mux"
 	"rest-api/controller"
+	"rest-api/middleware"
 )
 
 var router = route()
@@ -12,6 +13,9 @@ func route() *mux.Router {
 }
 
 func RegisterRoutes() *mux.Router {
+
+	router.Use(middleware.ContentType, middleware.Accept)
+	
 	usersRouter := router.PathPrefix("/api/v1").Subrouter()
 	usersRouter.HandleFunc("/users", controller.CreateUser).Methods("POST")
 	usersRouter.HandleFunc("/users", controller.GetUsers).Methods("GET")
