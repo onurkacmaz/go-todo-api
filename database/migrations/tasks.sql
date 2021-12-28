@@ -1,4 +1,4 @@
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
     id INT NOT NULL UNIQUE AUTO_INCREMENT,
     user_id int NOT NULL,
     title varchar(255) NOT NULL,
