@@ -2,19 +2,14 @@ package database
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-	"io/fs"
 	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
 	"rest-api/config"
-	"runtime"
-)
+	"rest-api/util"
 
-var (
-	_, b, _, _ = runtime.Caller(0)
-	basePath   = filepath.Dir(b)
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func Instance() *sql.DB {
@@ -36,17 +31,13 @@ func Instance() *sql.DB {
 
 }
 
-func GetFiles() []fs.FileInfo {
-	files, err := ioutil.ReadDir(basePath + "/migrations/")
-	if err != nil {
-		panic(err)
-	}
-	return files
-}
-
 func Migrate() {
-	for _, file := range GetFiles() {
-		q, err := ioutil.ReadFile(filepath.Join(basePath+"/migrations/", file.Name()))
+	path := "/database/migrations/"
+	file := util.Files(path)
+	files := file.GetFiles()
+	basePath := file.GetBasePath()
+	for _, file := range files {
+		q, err := ioutil.ReadFile(filepath.Join(filepath.Join(basePath, path), file.Name()))
 		if err != nil {
 			panic(err)
 		}
