@@ -1,5 +1,5 @@
-# go-rest-example
-go rest example
+# go-todo-server
+This repo is basic todo app api.
 
 # Install
 
