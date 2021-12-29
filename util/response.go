@@ -9,7 +9,7 @@ import (
 type Response struct {
 	Status  int
 	Data    interface{}
-	Message string
+	Message interface{}
 }
 
 func (r Response) ResponseJson(w http.ResponseWriter) {
