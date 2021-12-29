@@ -30,11 +30,8 @@ func (t Task) Update() bool {
 		panic(err)
 	}
 
-	res, err := result.LastInsertId()
+	_, err = result.LastInsertId()
 	if err != nil {
-		panic(err)
-	}
-	if res == 0 {
 		return false
 	}
 	return true
@@ -52,7 +49,7 @@ func (t Task) Get() Task {
 	var task Task
 	rows, err := database.Instance().Query(`SELECT * FROM tasks WHERE id = ?`, t.Id)
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 	for rows.Next() {
 		err := rows.Scan(&task.Id, &task.UserId, &task.Title, &task.Content, &task.Status, &task.CreatedAt)

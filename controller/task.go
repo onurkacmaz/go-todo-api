@@ -35,7 +35,7 @@ func ShowTask(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(params["id"])
 
 	task := repository.Task{Id: id}.Get()
-	if task.UserId > 0 {
+	if task.UserId <= 0 {
 		util.Response{
 			Status:  404,
 			Message: "Task not found.",
