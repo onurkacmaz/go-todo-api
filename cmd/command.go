@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"rest-api/database"
+	"rest-api/repository"
 	"rest-api/util"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -22,6 +24,22 @@ func main() {
 			return
 		}
 		database.Migrate()
+	case "user":
+		if os.Args[2] == "create" {
+			name := prompt("Name:")
+			email := prompt("Email:")
+			password := prompt("Password:")
+			res := repository.User{
+				Name:      name,
+				Email:     email,
+				Password:  password,
+				CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+			}.Create()
+			if res.Id > 0 {
+				fmt.Println("User created successfully")
+			}
+		}
+		break
 	default:
 		fmt.Print("No command provided.")
 	}

@@ -3,7 +3,6 @@ package middleware
 import (
 	b64 "encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"rest-api/controller"
 	"strings"
@@ -46,10 +45,7 @@ func Accept(next http.Handler) http.Handler {
 
 func BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth := r.Header.Get("Authorization")
-		base64 := strings.Replace(auth, "Basic ", "", -1)
-		fmt.Println(base64)
-		data, err := b64.StdEncoding.DecodeString(base64)
+		data, err := b64.StdEncoding.DecodeString(strings.Replace(r.Header.Get("Authorization"), "Basic ", "", -1))
 		if err != nil {
 			panic(err)
 		}

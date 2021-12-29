@@ -1,5 +1,5 @@
 package controller
 
 func Check(email string, password string) bool {
-	return GetUserByCredentials(email, password)
+	return IsUserExistsByCredentials(email, password)
 }
