@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	b64 "encoding/base64"
 	"encoding/json"
 	"net/http"
 	"rest-api/controller"
+	"rest-api/util"
 	"strings"
 )
 
@@ -43,21 +43,14 @@ func Accept(next http.Handler) http.Handler {
 	})
 }
 
-func BasicAuth(next http.Handler) http.Handler {
+func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		data, err := b64.StdEncoding.DecodeString(strings.Replace(r.Header.Get("Authorization"), "Basic ", "", -1))
-		if err != nil {
-			panic(err)
-		}
-		credentials := strings.Split(string(data), ":")
-		email := credentials[0]
-		password := credentials[1]
-		if !controller.Check(email, password) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(Response{
+		token := strings.Replace(r.Header.Get("Authorization"), "Bearer ", "", -1)
+		if !controller.IsTokenValid(token) {
+			util.Response{
 				Status:  401,
-				Message: "Invalid credentials",
-			})
+				Message: "Token is invalid.",
+			}.ResponseJson(w)
 			return
 		}
 		next.ServeHTTP(w, r)

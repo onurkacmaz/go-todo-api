@@ -14,20 +14,23 @@ func route() *mux.Router {
 
 func RegisterRoutes() *mux.Router {
 
-	router.Use(middleware.ContentType, middleware.Accept, middleware.BasicAuth)
+	authorizationRouter := router.PathPrefix("/api/v1/auth").Subrouter()
+	authorizationRouter.HandleFunc("/token", controller.CreateToken).Methods("POST")
 
-	usersRouter := router.PathPrefix("/api/v1").Subrouter()
-	usersRouter.HandleFunc("/users", controller.CreateUser).Methods("POST")
-	usersRouter.HandleFunc("/users", controller.GetUsers).Methods("GET")
-	usersRouter.HandleFunc("/users/{id}", controller.ShowUser).Methods("GET")
-	usersRouter.HandleFunc("/users/{id}", controller.DeleteUser).Methods("DELETE")
-	usersRouter.HandleFunc("/users/{id}", controller.UpdateUser).Methods("PUT")
+	authenticatedRouter := router.PathPrefix("/api/v1").Subrouter()
+	authenticatedRouter.Use(middleware.ContentType, middleware.Accept, middleware.Auth)
 
-	tasksRouter := router.PathPrefix("/api/v1").Subrouter()
-	tasksRouter.HandleFunc("/tasks", controller.CreateTask).Methods("POST")
-	tasksRouter.HandleFunc("/tasks", controller.GetTasks).Methods("GET")
-	tasksRouter.HandleFunc("/tasks/{id}", controller.ShowTask).Methods("GET")
-	tasksRouter.HandleFunc("/tasks/{id}", controller.DeleteTask).Methods("DELETE")
-	tasksRouter.HandleFunc("/tasks/{id}", controller.UpdateTask).Methods("PUT")
+	authenticatedRouter.HandleFunc("/users", controller.CreateUser).Methods("POST")
+	authenticatedRouter.HandleFunc("/users", controller.GetUsers).Methods("GET")
+	authenticatedRouter.HandleFunc("/users/{id}", controller.ShowUser).Methods("GET")
+	authenticatedRouter.HandleFunc("/users/{id}", controller.DeleteUser).Methods("DELETE")
+	authenticatedRouter.HandleFunc("/users/{id}", controller.UpdateUser).Methods("PUT")
+
+	authenticatedRouter.HandleFunc("/tasks", controller.CreateTask).Methods("POST")
+	authenticatedRouter.HandleFunc("/tasks", controller.GetTasks).Methods("GET")
+	authenticatedRouter.HandleFunc("/tasks/{id}", controller.ShowTask).Methods("GET")
+	authenticatedRouter.HandleFunc("/tasks/{id}", controller.DeleteTask).Methods("DELETE")
+	authenticatedRouter.HandleFunc("/tasks/{id}", controller.UpdateTask).Methods("PUT")
+
 	return router
 }
