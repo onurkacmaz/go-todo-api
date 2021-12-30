@@ -24,6 +24,7 @@ func main() {
 			return
 		}
 		database.Migrate()
+		fmt.Println("Tables migrated successfully.")
 	case "user":
 		if os.Args[2] == "create" {
 			name := prompt("Name:")
@@ -49,7 +50,10 @@ func prompt(label string) string {
 	var s string
 	r := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Fprint(os.Stderr, label+" ")
+		_, err := fmt.Fprint(os.Stderr, label+" ")
+		if err != nil {
+			return ""
+		}
 		s, _ = r.ReadString('\n')
 		if s != "" {
 			break

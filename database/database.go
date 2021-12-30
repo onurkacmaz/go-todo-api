@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"io/fs"
 	"io/ioutil"
 	"net"
 	"os"
@@ -33,20 +34,21 @@ func Instance() *sql.DB {
 
 func Migrate() {
 	path := "/database/migrations/"
-	file := util.Files(path)
-	files := file.GetFiles()
-	basePath := file.GetBasePath()
+	fileA := util.Files(path)
+	files := fileA.GetFiles()
 	for _, file := range files {
-		q, err := ioutil.ReadFile(filepath.Join(filepath.Join(basePath, path), file.Name()))
+		_, err := Instance().Exec(ReadFile(file, fileA.GetBasePath()))
 		if err != nil {
 			panic(err)
 		}
-
-		defer func(q string) {
-			_, err = Instance().Exec(string(q))
-			if err != nil {
-				panic(err)
-			}
-		}(string(q))
 	}
+}
+
+func ReadFile(file fs.FileInfo, basePath string) string {
+	path := "/database/migrations/"
+	q, err := ioutil.ReadFile(filepath.Join(filepath.Join(basePath, path), file.Name()))
+	if err != nil {
+		panic(err)
+	}
+	return string(q)
 }

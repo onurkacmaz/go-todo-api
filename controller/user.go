@@ -3,15 +3,12 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"rest-api/database"
 	"rest-api/repository"
 	"rest-api/util"
 	"strconv"
 
 	"github.com/gorilla/mux"
 )
-
-var db = database.Instance()
 
 func GetUsers(w http.ResponseWriter, _ *http.Request) {
 	util.Response{Status: 200, Data: repository.User{}.All()}.ResponseJson(w)
