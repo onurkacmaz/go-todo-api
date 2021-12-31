@@ -1,4 +1,4 @@
-# go-todo-server
+# go-todo-api
 This repo is basic todo app api.
 
 # Install
