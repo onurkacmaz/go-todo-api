@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"rest-api/repository"
 	"rest-api/util"
@@ -24,17 +23,11 @@ func IsTokenValid(token string) bool {
 		return false
 	}
 
-	expiredAt, _ := time.Parse("2006-01-02 15:04:05", t.ExpiredAt)
-	now := time.Now()
+	now := time.Now().Format("2006-01-02 15:04:05")
+	expiredAt, _ := time.Parse(time.RFC3339, t.ExpiredAt)
+	formattedExpiredAt := expiredAt.Format("2006-01-02 15:04:05")
 
-	diff := now.Sub(expiredAt)
-	hours := diff.Hours()
-	log.Println(hours)
-	if hours >= 0 {
-		return false
-	}
-
-	return true
+	return !(now >= formattedExpiredAt)
 }
 
 func CreateToken(w http.ResponseWriter, r *http.Request) {
