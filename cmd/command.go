@@ -7,6 +7,7 @@ import (
 	"rest-api/database"
 	"rest-api/repository"
 	"rest-api/util"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -38,6 +39,21 @@ func main() {
 			}.Create()
 			if res.Id > 0 {
 				fmt.Println("User created successfully")
+			}
+		}
+		break
+	case "token":
+		if os.Args[2] == "create" {
+			userId, _ := strconv.Atoi(prompt("User Id:"))
+			expiredAt := prompt("Expired At:")
+			res := repository.Token{
+				UserId:    userId,
+				Token:     repository.GenerateToken(10),
+				ExpiredAt: expiredAt,
+				CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+			}.Create()
+			if res.Id > 0 {
+				fmt.Println("Token generated and created successfully")
 			}
 		}
 		break

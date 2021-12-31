@@ -59,6 +59,6 @@ func CreateToken(w http.ResponseWriter, r *http.Request) {
 
 	util.Response{
 		Status: 201,
-		Data:   repository.Token{}.Create(u),
+		Data:   repository.Token{}.Create(),
 	}.ResponseJson(w)
 }
