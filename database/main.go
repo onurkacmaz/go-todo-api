@@ -5,26 +5,20 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"net"
-	"os"
 	"path/filepath"
-	"rest-api/config"
-	"rest-api/util"
+	"rest-api/model/config"
+	"rest-api/util/file"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func Instance() *sql.DB {
 
-	config.LoadLocalEnv()
+	c := config.Get()
 
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbUrl := net.JoinHostPort(dbHost, dbPort)
+	dbUrl := net.JoinHostPort(c.DbHost, c.DbPort)
 
-	db, err := sql.Open("mysql", dbUser+":"+dbPassword+"@("+dbUrl+")/"+dbName+"?parseTime=true")
+	db, err := sql.Open("mysql", c.DbUser+":"+c.DbPassword+"@("+dbUrl+")/"+c.DbName+"?parseTime=true")
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +28,7 @@ func Instance() *sql.DB {
 
 func Migrate() {
 	path := "/database/migrations/"
-	fileA := util.Files(path)
+	fileA := file.Files(path)
 	files := fileA.GetFiles()
 	for _, file := range files {
 		_, err := Instance().Exec(ReadFile(file, fileA.GetBasePath()))

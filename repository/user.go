@@ -29,11 +29,8 @@ func (u User) Update() bool {
 		panic(err)
 	}
 
-	res, err := result.LastInsertId()
-	if err != nil {
-		panic(err)
-	}
-	if res == 0 {
+	res, err := result.RowsAffected()
+	if err != nil || res == 0 {
 		return false
 	}
 	return true

@@ -1,18 +1,18 @@
-package route
+package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
+	"net"
+	"net/http"
 	"rest-api/controller"
 	"rest-api/middleware"
+	"rest-api/model/config"
 )
 
-var router = route()
+func routes() *mux.Router {
 
-func route() *mux.Router {
-	return mux.NewRouter()
-}
-
-func RegisterRoutes() *mux.Router {
+	router := mux.NewRouter()
 
 	authorizationRouter := router.PathPrefix("/api/v1/auth").Subrouter()
 	authorizationRouter.HandleFunc("/token", controller.CreateToken).Methods("POST")
@@ -33,4 +33,24 @@ func RegisterRoutes() *mux.Router {
 	authenticatedRouter.HandleFunc("/tasks/{id}", controller.UpdateTask).Methods("PUT")
 
 	return router
+}
+
+func main() {
+
+	c := config.Get()
+
+	fmt.Printf("Server is started at %v:%s", c.SrvHost, c.SrvPort)
+
+	err := http.ListenAndServe(
+		net.JoinHostPort(
+			c.SrvHost,
+			c.SrvPort,
+		),
+		routes(),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
 }

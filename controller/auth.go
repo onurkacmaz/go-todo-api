@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"rest-api/repository"
-	"rest-api/util"
+	"rest-api/util/response"
+
 	"time"
 )
 
@@ -41,7 +42,7 @@ func CreateToken(w http.ResponseWriter, r *http.Request) {
 
 	isUserExists := Check(credentials.Email, credentials.Password)
 	if !isUserExists {
-		util.Response{
+		response.Response{
 			Status:  401,
 			Message: "Invalid Credentials",
 		}.ResponseJson(w)
@@ -50,14 +51,14 @@ func CreateToken(w http.ResponseWriter, r *http.Request) {
 
 	u := repository.User{Email: credentials.Email, Password: credentials.Password}.GetByCredentials()
 	if u.Id <= 0 {
-		util.Response{
+		response.Response{
 			Status:  401,
 			Message: "Invalid Credentials",
 		}.ResponseJson(w)
 		return
 	}
 
-	util.Response{
+	response.Response{
 		Status: 201,
 		Data:   repository.Token{}.Create(),
 	}.ResponseJson(w)

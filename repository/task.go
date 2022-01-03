@@ -25,13 +25,13 @@ func (t Task) Create() Task {
 }
 
 func (t Task) Update() bool {
-	result, err := database.Instance().Exec(`UPDATE tasks SET user_id = ?, title = ?, content = ?, status = ?, created_at = ? WHERE id = ?`, t.UserId, t.Title, t.Content, t.Status, t.CreatedAt, t.Id)
+	result, err := database.Instance().Exec(`UPDATE tasks SET title = ?, content = ?, status = ?, created_at = ? WHERE id = ?`, t.Title, t.Content, t.Status, t.CreatedAt, t.Id)
 	if err != nil {
-		panic(err)
+		return false
 	}
 
-	_, err = result.LastInsertId()
-	if err != nil {
+	res, err := result.RowsAffected()
+	if err != nil || res == 0 {
 		return false
 	}
 	return true

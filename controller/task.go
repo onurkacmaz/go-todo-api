@@ -5,12 +5,12 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"rest-api/repository"
-	"rest-api/util"
+	"rest-api/util/response"
 	"strconv"
 )
 
 func GetTasks(w http.ResponseWriter, _ *http.Request) {
-	util.Response{
+	response.Response{
 		Status: 200,
 		Data:   repository.Task{}.All(),
 	}.ResponseJson(w)
@@ -24,7 +24,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	res := task.Create()
-	util.Response{
+	response.Response{
 		Status: 201,
 		Data:   res,
 	}.ResponseJson(w)
@@ -36,13 +36,13 @@ func ShowTask(w http.ResponseWriter, r *http.Request) {
 
 	task := repository.Task{Id: id}.Get()
 	if task.UserId <= 0 {
-		util.Response{
+		response.Response{
 			Status:  404,
 			Message: "Task not found.",
 		}.ResponseJson(w)
 		return
 	}
-	util.Response{
+	response.Response{
 		Status: 200,
 		Data:   task,
 	}.ResponseJson(w)
@@ -52,7 +52,7 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, _ := strconv.Atoi(params["id"])
 	repository.Task{Id: id}.Delete()
-	util.Response{Status: 204}.ResponseNoContent(w)
+	response.Response{Status: 204}.ResponseNoContent(w)
 }
 
 func UpdateTask(w http.ResponseWriter, r *http.Request) {
@@ -68,13 +68,13 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 
 	res := task.Update()
 	if res == false {
-		util.Response{
+		response.Response{
 			Status:  400,
 			Message: "error",
 		}.ResponseJson(w)
 		return
 	}
-	util.Response{
+	response.Response{
 		Status: 200,
 		Data:   task,
 	}.ResponseJson(w)

@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"rest-api/database"
+	main2 "rest-api/database"
 	"rest-api/repository"
-	"rest-api/util"
+	"rest-api/util/file"
 	"strconv"
 	"strings"
 	"time"
@@ -18,13 +18,13 @@ func main() {
 
 	switch cmd {
 	case "migrate":
-		file := util.Files("/database/migrations/")
+		file := file.Files("/database/migrations/")
 		countOfFiles := len(file.GetFiles())
 		r := prompt(fmt.Sprintf("%v files found. Are you sure do you want to migrate?", countOfFiles))
 		if r == "no" {
 			return
 		}
-		database.Migrate()
+		main2.Migrate()
 		fmt.Println("Tables migrated successfully.")
 	case "user":
 		if os.Args[2] == "create" {

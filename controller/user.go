@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"rest-api/repository"
-	"rest-api/util"
+	"rest-api/util/response"
 	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
 func GetUsers(w http.ResponseWriter, _ *http.Request) {
-	util.Response{Status: 200, Data: repository.User{}.All()}.ResponseJson(w)
+	response.Response{Status: 200, Data: repository.User{}.All()}.ResponseJson(w)
 }
 
 func ShowUser(w http.ResponseWriter, r *http.Request) {
@@ -20,10 +20,10 @@ func ShowUser(w http.ResponseWriter, r *http.Request) {
 
 	user := repository.User{Id: id}.Get()
 	if user.Email == "" {
-		util.Response{Status: 404, Data: nil}.ResponseJson(w)
+		response.Response{Status: 404, Data: nil}.ResponseJson(w)
 		return
 	}
-	util.Response{Status: 200, Data: user}.ResponseJson(w)
+	response.Response{Status: 200, Data: user}.ResponseJson(w)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +35,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	u.Id = id
 	u.Delete()
-	util.Response{Status: 204, Data: nil}.ResponseNoContent(w)
+	response.Response{Status: 204, Data: nil}.ResponseNoContent(w)
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 	res := u.Create()
-	util.Response{Status: 201, Data: res}.ResponseJson(w)
+	response.Response{Status: 201, Data: res}.ResponseJson(w)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -67,10 +67,10 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	res := user.Update()
 	if res == false {
-		util.Response{Status: 400, Data: nil, Message: "error"}.ResponseJson(w)
+		response.Response{Status: 400, Data: nil, Message: "error"}.ResponseJson(w)
 		return
 	}
-	util.Response{Status: 200, Data: res}.ResponseJson(w)
+	response.Response{Status: 200, Data: res}.ResponseJson(w)
 }
 
 func IsUserExistsByCredentials(email string, password string) bool {

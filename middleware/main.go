@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"rest-api/controller"
-	"rest-api/util"
+	"rest-api/util/response"
 	"strings"
 )
 
@@ -47,7 +47,7 @@ func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := strings.Replace(r.Header.Get("Authorization"), "Bearer ", "", -1)
 		if !controller.IsTokenValid(token) {
-			util.Response{
+			response.Response{
 				Status:  401,
 				Message: "Token is invalid.",
 			}.ResponseJson(w)
